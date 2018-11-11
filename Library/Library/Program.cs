@@ -109,6 +109,10 @@ namespace Library
 			
 		}
 
+		/// <summary>
+		/// Iterates through the "books" List and writes a table of the contents of
+		/// the objects to the console.
+		/// </summary>
 		public void DisplayAllBooks()
 		{
 			string loanedStat;
@@ -126,6 +130,10 @@ namespace Library
 			}
 		}
 
+		/// <summary>
+		/// Allows a user to loan a book from the library,
+		/// by providing the name of a registered Loaner.
+		/// </summary>
 		public void LoanBook()
 		{
 			string tempName;
@@ -161,6 +169,12 @@ namespace Library
 			else Console.WriteLine("No loaner has that name");
 		}
 
+		/// <summary>
+		/// A helper function that retrieves a reference to a Loaner object
+		/// based on the "name" variable of the object.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
 		private Loaner GetLoanerByName(string name)
 		{
 			for (int i = 0; i < loaners.Count; i += 1)
@@ -174,7 +188,8 @@ namespace Library
 		/// Matches the input title and author to all books
 		/// in the "books" list until it finds a match
 		/// </summary>
-		/// <param name="title">The title to be used for searching</param>
+		/// <param name="title">The title to be used for searching.</param>
+		/// <param name="author">The author to be used for searching.</param>
 		/// <returns>Returns an object of type Book, null if no match is found.</returns>
 		private Book GetBookByTitle(string title, string author)
 		{
@@ -185,6 +200,12 @@ namespace Library
 			return null;
 		}
 
+		/// <summary>
+		/// Matches the input title to all books
+		/// in the "books" list until it finds a match
+		/// </summary>
+		/// <param name="title">The title to be used for searching</param>
+		/// <returns>Returns an object of type Book, null if no match is found.</returns>
 		private Book GetBookByTitle(string title)
 		{
 			for (int i = 0; i < books.Count; i += 1)
@@ -194,6 +215,9 @@ namespace Library
 			return null;
 		}
 
+		/// <summary>
+		/// Adds a new book to the library based on user input.
+		/// </summary>
 		public void AddBookToLibrary()
 		{
 			Console.WriteLine("Please enter the title of the book you would like to add.");
