@@ -17,8 +17,12 @@ namespace Library
 				{
 					Console.WriteLine(i + 1 + ") " + options[i]);
 				}
+				
+				string input = Console.ReadLine();
+				if (input == "")
+					continue;
 
-				switch (Console.ReadLine()[0])
+				switch (input[0])
 				{
 					case '1':
 						lib.DisplayAllBooks();
