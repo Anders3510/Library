@@ -40,61 +40,6 @@ namespace Library
 		}
 	}
 
-	class Loaner
-	{
-		readonly List<Book> loanedBooks = new List<Book>();
-		readonly string loanerName;
-
-		public Loaner(string _loanerName)
-		{
-			loanerName = _loanerName;
-		}
-
-		public string GetName()
-		{
-			return loanerName;
-		}
-
-		public List<Book> GetLoanedBooks()
-		{
-			return loanedBooks;
-		}
-	}
-
-	class Book
-	{
-		public readonly string title;
-		public readonly string author;
-		public readonly DateTime timeLoaned;
-		public bool isLoaned;
-
-		public Book(string _title, string _author)
-		{
-			title = _title;
-			author = _author;
-		}
-
-		public string GetTitle()
-		{
-			return title;
-		}
-
-		public string GetAuthor()
-		{
-			return author;
-		}
-
-		public DateTime GetTimeLoaned()
-		{
-			return timeLoaned;
-		}
-
-		public bool IsLoanedOut()
-		{
-			return isLoaned;
-		}
-	}
-
 	class Library
 	{
 		readonly List<Book> books = new List<Book>();
@@ -107,6 +52,69 @@ namespace Library
 			loaners.Add(new Loaner("Flamingo"));
 			loaners.Add(new Loaner("Henning"));
 			
+		}
+
+		class Loaner
+		{
+			readonly List<Book> loanedBooks = new List<Book>();
+			readonly string loanerName;
+
+			public Loaner(string _loanerName)
+			{
+				loanerName = _loanerName;
+			}
+
+			public string GetName()
+			{
+				return loanerName;
+			}
+
+			public List<Book> GetLoanedBooks()
+			{
+				return loanedBooks;
+			}
+		}
+
+
+		class Book
+		{
+			public readonly string title;
+			public readonly string author;
+			public readonly DateTime timeLoaned;
+			public bool isLoaned;
+
+			public Book(string _title, string _author)
+			{
+				title = _title;
+				author = _author;
+			}
+
+			public string GetTitle()
+			{
+				return title;
+			}
+
+			public string GetAuthor()
+			{
+				return author;
+			}
+
+			public DateTime GetTimeLoaned()
+			{
+				return timeLoaned;
+			}
+
+			public bool IsLoanedOut()
+			{
+				return isLoaned;
+			}
+		}
+
+		public void NewLoaner()
+		{
+			Console.WriteLine("Please enter a name.");
+			loaners.Add(new Loaner(Console.ReadLine()));
+			Console.WriteLine("A new loaner has been registered sucessfully.");
 		}
 
 		/// <summary>
