@@ -61,7 +61,6 @@ namespace Library
 	{
 		readonly List<Book> books = new List<Book>();
 		readonly List<Loaner> loaners = new List<Loaner>();
-		readonly DateTime maxLoanTime = new DateTime(0);
 		const string LoanerPath = @"../../../loaners.bin";
 		const string BooksPath = @"../../../books.bin";
 
@@ -120,7 +119,6 @@ namespace Library
 		{
 			public readonly string title;
 			public readonly string author;
-			public readonly DateTime timeLoaned;
 			public bool isLoaned;
 
 			public Book(string _title, string _author)
@@ -138,13 +136,11 @@ namespace Library
 			{
 				return author;
 			}
-
-			public DateTime GetTimeLoaned()
-			{
-				return timeLoaned;
-			}
 		}
 
+		/// <summary>
+		/// Prompts the user for a name and creates a new loaner.
+		/// </summary>
 		public void NewLoaner()
 		{
 			Console.WriteLine("Please enter a name.");
@@ -173,6 +169,10 @@ namespace Library
 			}
 		}
 
+		/// <summary>
+		/// Writes a complete list of all registered loaners
+		/// and their loaned books to the console.
+		/// </summary>
 		public void DisplayAllLoaners()
 		{
 			for (int i = 0; i < loaners.Count; i += 1)
@@ -225,6 +225,11 @@ namespace Library
 			else Console.WriteLine("No loaner has that name");
 		}
 
+		/// <summary>
+		/// Allows a user to return a book to the library,
+		/// by providing the name of a registered Loaner,
+		/// and selecting which book they want to return.
+		/// </summary>
 		public void ReturnBook()
 		{
 			string tempName;
