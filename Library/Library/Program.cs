@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Library
 {
@@ -7,7 +9,7 @@ namespace Library
 	{
 		static void Main(string[] args)
 		{
-			string[] options = { "Display a list of all books", "Add a new book to the library", "Loan a book" };
+			string[] options = { "Display a list of all books","Display a list of loaners", "Add a new book to the library", "Register a new loaner", "Loan a book" };
 			bool isRunning = true;
 			Library lib = new Library();
 
@@ -17,7 +19,7 @@ namespace Library
 				{
 					Console.WriteLine(i + 1 + ") " + options[i]);
 				}
-				
+
 				string input = Console.ReadLine();
 				if (input == "")
 					continue;
@@ -28,14 +30,24 @@ namespace Library
 						lib.DisplayAllBooks();
 						break;
 
-					case '2':
-						lib.AddBookToLibrary();
+					case '2': 
+						lib.DisplayAllLoaners();
 						break;
 
 					case '3':
+						lib.AddBookToLibrary();
+						break;
+
+					case '4':
+						lib.NewLoaner();
+						break;
+
+					case '5':
 						lib.LoanBook();
 						break;
 				}
+
+				lib.WriteToFiles();
 			}
 		}
 	}
@@ -45,18 +57,46 @@ namespace Library
 		readonly List<Book> books = new List<Book>();
 		readonly List<Loaner> loaners = new List<Loaner>();
 		readonly DateTime maxLoanTime = new DateTime(0);
+		const string LoanerPath = @"../../../loaners.bin";
+		const string BooksPath = @"../../../books.bin";
 
 		public Library()
 		{
-			loaners.Add(new Loaner("Gert"));
-			loaners.Add(new Loaner("Flamingo"));
-			loaners.Add(new Loaner("Henning"));
-			
+			if(File.Exists(LoanerPath))
+			{
+				try
+				{
+					using (Stream st = File.Open(LoanerPath, FileMode.Open))
+					{
+						BinaryFormatter bin = new BinaryFormatter();
+						loaners = (List<Loaner>)bin.Deserialize(st);
+					}
+				}
+				catch (IOException)
+				{
+				}
+			}
+
+			if(File.Exists(BooksPath))
+			{
+				try
+				{
+					using (Stream st = File.Open(BooksPath, FileMode.Open))
+					{
+						BinaryFormatter bin = new BinaryFormatter();
+						books = (List<Book>)bin.Deserialize(st);
+					}
+				}
+				catch (IOException)
+				{
+				}
+			}
 		}
 
+		[Serializable]
 		class Loaner
 		{
-			readonly List<Book> loanedBooks = new List<Book>();
+			public readonly List<Book> loanedBooks = new List<Book>();
 			readonly string loanerName;
 
 			public Loaner(string _loanerName)
@@ -68,14 +108,9 @@ namespace Library
 			{
 				return loanerName;
 			}
-
-			public List<Book> GetLoanedBooks()
-			{
-				return loanedBooks;
-			}
 		}
 
-
+		[Serializable]
 		class Book
 		{
 			public readonly string title;
@@ -138,6 +173,18 @@ namespace Library
 			}
 		}
 
+		public void DisplayAllLoaners()
+		{
+			for(int i = 0; i < loaners.Count; i += 1)
+			{
+				Console.WriteLine(loaners[i].GetName());
+				for(int j = 0; j < loaners[i].loanedBooks.Count; j += 1)
+				{
+					Console.WriteLine("  " + loaners[i].loanedBooks[j].GetTitle() + " by " + loaners[i].loanedBooks[j].GetAuthor());
+				}
+			}
+		}
+
 		/// <summary>
 		/// Allows a user to loan a book from the library,
 		/// by providing the name of a registered Loaner.
@@ -166,7 +213,7 @@ namespace Library
 				{
 					if (!books[result - 1].IsLoanedOut())
 					{
-						GetLoanerByName(tempName).GetLoanedBooks().Add(books[result - 1]);
+						GetLoanerByName(tempName).loanedBooks.Add(books[result - 1]);
 						books[result - 1].isLoaned = true;
 						Console.WriteLine("The book has been loaned sucessfully.");
 					}
@@ -254,6 +301,31 @@ namespace Library
 				Console.WriteLine("A book with that title and author is already in the library.");
 		}
 
+		public void WriteToFiles()
+		{
+			try
+			{
+				using (Stream st = File.Open(LoanerPath, FileMode.Create))
+				{
+					BinaryFormatter bin = new BinaryFormatter();
+					bin.Serialize(st, loaners);
+				}
+			}
+			catch (IOException)
+			{
+			}
 
+			try
+			{
+				using (Stream st = File.Open(BooksPath, FileMode.Create))
+				{
+					BinaryFormatter bin = new BinaryFormatter();
+					bin.Serialize(st, books);
+				}
+			}
+			catch (IOException)
+			{
+			}
+		}
 	}
 }
