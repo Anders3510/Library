@@ -9,7 +9,7 @@ namespace Library
 	{
 		static void Main(string[] args)
 		{
-			string[] options = { "Display a list of all books","Display a list of loaners", "Add a new book to the library", "Register a new loaner", "Loan a book" };
+			string[] options = { "Display a list of all books", "Display a list of loaners", "Add a new book to the library", "Register a new loaner", "Loan a book", "Return a book" };
 			bool isRunning = true;
 			Library lib = new Library();
 
@@ -24,13 +24,14 @@ namespace Library
 				if (input == "")
 					continue;
 
+				Console.Clear();
 				switch (input[0])
 				{
 					case '1':
 						lib.DisplayAllBooks();
 						break;
 
-					case '2': 
+					case '2':
 						lib.DisplayAllLoaners();
 						break;
 
@@ -45,8 +46,12 @@ namespace Library
 					case '5':
 						lib.LoanBook();
 						break;
-				}
 
+					case '6':
+						lib.ReturnBook();
+						break;
+				}
+				Console.WriteLine();
 				lib.WriteToFiles();
 			}
 		}
@@ -62,7 +67,7 @@ namespace Library
 
 		public Library()
 		{
-			if(File.Exists(LoanerPath))
+			if (File.Exists(LoanerPath))
 			{
 				try
 				{
@@ -77,7 +82,7 @@ namespace Library
 				}
 			}
 
-			if(File.Exists(BooksPath))
+			if (File.Exists(BooksPath))
 			{
 				try
 				{
@@ -138,11 +143,6 @@ namespace Library
 			{
 				return timeLoaned;
 			}
-
-			public bool IsLoanedOut()
-			{
-				return isLoaned;
-			}
 		}
 
 		public void NewLoaner()
@@ -164,7 +164,7 @@ namespace Library
 
 			for (int i = 0; i < books.Count; i += 1)
 			{
-				if (books[i].IsLoanedOut())
+				if (books[i].isLoaned)
 					loanedStat = "Yes";
 				else
 					loanedStat = "No";
@@ -175,10 +175,10 @@ namespace Library
 
 		public void DisplayAllLoaners()
 		{
-			for(int i = 0; i < loaners.Count; i += 1)
+			for (int i = 0; i < loaners.Count; i += 1)
 			{
 				Console.WriteLine(loaners[i].GetName());
-				for(int j = 0; j < loaners[i].loanedBooks.Count; j += 1)
+				for (int j = 0; j < loaners[i].loanedBooks.Count; j += 1)
 				{
 					Console.WriteLine("  " + loaners[i].loanedBooks[j].GetTitle() + " by " + loaners[i].loanedBooks[j].GetAuthor());
 				}
@@ -196,8 +196,9 @@ namespace Library
 			tempName = Console.ReadLine();
 			if (GetLoanerByName(tempName) != null)
 			{
-				DisplayAllBooks();
+
 				Console.WriteLine("Please select which book you would like to loan.");
+				DisplayAllBooks();
 				string input = Console.ReadLine();
 				int result;
 
@@ -211,7 +212,7 @@ namespace Library
 					Console.WriteLine("Something went wrong, please try again.");
 				else
 				{
-					if (!books[result - 1].IsLoanedOut())
+					if (!books[result - 1].isLoaned)
 					{
 						GetLoanerByName(tempName).loanedBooks.Add(books[result - 1]);
 						books[result - 1].isLoaned = true;
@@ -219,6 +220,50 @@ namespace Library
 					}
 					else
 						Console.WriteLine("That book is already loaned out.");
+				}
+			}
+			else Console.WriteLine("No loaner has that name");
+		}
+
+		public void ReturnBook()
+		{
+			string tempName;
+			string input;
+			Console.WriteLine("Who is returning a book?");
+			tempName = Console.ReadLine();
+			if (GetLoanerByName(tempName) != null)
+			{
+				int result;
+				Loaner l = GetLoanerByName(tempName);
+
+				for (int i = 0; i < l.loanedBooks.Count; i += 1)
+					Console.WriteLine(i + 1 + ". " + l.loanedBooks[i].title + "  " + l.loanedBooks[i].author);
+
+				Console.WriteLine("Please select which book you would like to return.");
+				input = Console.ReadLine();
+
+				while (!int.TryParse(input, out result))
+				{
+					Console.WriteLine("Please write a number.");
+					input = Console.ReadLine();
+				}
+
+				if (result > GetLoanerByName(tempName).loanedBooks.Count)
+					Console.WriteLine("Something went wrong, please try again.");
+				else
+				{
+					result -= 1;
+					if (l.loanedBooks[result].isLoaned)
+					{
+						for (int i = 0; i < books.Count; i += 1)
+							if (books[i] == l.loanedBooks[result])
+								books[i].isLoaned = false;
+
+						l.loanedBooks.RemoveAt(result);
+						Console.WriteLine("The book has been returned sucessfully.");
+					}
+					else
+						Console.WriteLine("That book isn't loaned out.");
 				}
 			}
 			else Console.WriteLine("No loaner has that name");
@@ -301,6 +346,9 @@ namespace Library
 				Console.WriteLine("A book with that title and author is already in the library.");
 		}
 
+		/// <summary>
+		/// Writes loaners and books to binary files.
+		/// </summary>
 		public void WriteToFiles()
 		{
 			try
